@@ -80,8 +80,9 @@ class _NewsHomePageState extends State<NewsHomePage> {
   final _service = NewsService();
   List<NewsArticle> _topHeadlines = [];
   List<NewsArticle> _everythingArticles = [];
+  bool _isLoadingHeadlines = true;
+  bool _isLoadingEverything = true;
   String selectedCategory = 'general';
-  bool _loading = true;
 
   final List<String> categories = [
     'business',
@@ -100,21 +101,35 @@ class _NewsHomePageState extends State<NewsHomePage> {
   }
 
   Future<void> _loadNews() async {
-    setState(() => _loading = true);
+    setState(() {
+      _isLoadingHeadlines = true;
+      _isLoadingEverything = true;
+    });
+
     try {
       final headlines = await _service.fetchTopHeadlines(category: selectedCategory);
-      final everything = await _service.fetchEverything(query: selectedCategory);
       setState(() {
         _topHeadlines = headlines;
-        _everythingArticles = everything;
+        _isLoadingHeadlines = false;
       });
     } catch (_) {
       setState(() {
         _topHeadlines = [];
-        _everythingArticles = [];
+        _isLoadingHeadlines = false;
       });
-    } finally {
-      setState(() => _loading = false);
+    }
+
+    try {
+      final everything = await _service.fetchEverything(query: selectedCategory);
+      setState(() {
+        _everythingArticles = everything;
+        _isLoadingEverything = false;
+      });
+    } catch (_) {
+      setState(() {
+        _everythingArticles = [];
+        _isLoadingEverything = false;
+      });
     }
   }
 
@@ -128,59 +143,70 @@ class _NewsHomePageState extends State<NewsHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(child: _buildBannerAndTrending()),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: _buildCategories(),
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final article = _everythingArticles[index];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: CachedNetworkImage(
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _buildBannerAndTrending()),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: _buildCategories(),
+            ),
+          ),
+          _isLoadingEverything
+              ? const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              )
+              : SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: _everythingArticles.length,
+                  (context, index) {
+                    final article = _everythingArticles[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          color: Colors.red,
+                          child: CachedNetworkImage(
                             imageUrl: article.urlToImage,
-                            width: 80,
-                            height: 80,
+                            width: 122,
                             fit: BoxFit.cover,
                             placeholder: (_, __) => const Icon(Icons.image),
                             errorWidget: (_, __, ___) => const Icon(Icons.error),
                           ),
-                          title: Text(
-                            article.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Row(
-                            children: [
-                              const CircleAvatar(
-                                radius: 10,
-                                backgroundImage: NetworkImage(
-                                  "https://via.placeholder.com/100",
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(article.sourceName),
-                              const SizedBox(width: 12),
-                              Text(_formatTimeAgo(article.publishedAt)),
-                            ],
-                          ),
-                          trailing: const Icon(Icons.bookmark_border),
                         ),
-                      );
-                    }, childCount: _everythingArticles.length),
-                  ),
-                ],
+                        title: Text(
+                          article.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 10,
+                              backgroundImage: NetworkImage(article.urlToImage),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                article.sourceName,
+                                style: TextStyle(overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
+                            Text(_formatTimeAgo(article.publishedAt)),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.bookmark_border),
+                      ),
+                    );
+                  },
+                ),
               ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         selectedItemColor: Colors.red,
@@ -239,7 +265,15 @@ class _NewsHomePageState extends State<NewsHomePage> {
       height: 330,
       child: Stack(
         children: [
-          Container(height: 240, width: double.infinity, color: Colors.grey[300]),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image(
+              image: AssetImage('assets/images/background.png'),
+              height: 240,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
           Positioned.fill(
             child: Container(
               padding: const EdgeInsets.only(top: 60, left: 16, right: 16),
@@ -282,78 +316,80 @@ class _NewsHomePageState extends State<NewsHomePage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 140,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _topHeadlines.take(3).length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (_, index) {
-                        final article = _topHeadlines[index];
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Stack(
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl: article.urlToImage,
-                                height: 180,
-                                width: 280,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => const Icon(Icons.image),
-                                errorWidget: (_, __, ___) => const Icon(Icons.error),
-                              ),
-                              Positioned(
-                                left: 12,
-                                bottom: 12,
-                                right: 12,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      article.title,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
+                  _isLoadingHeadlines
+                      ? const Center(child: CircularProgressIndicator())
+                      : SizedBox(
+                        height: 140,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _topHeadlines.take(3).length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          itemBuilder: (_, index) {
+                            final article = _topHeadlines[index];
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: article.urlToImage,
+                                    height: 180,
+                                    width: 280,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, __) => const Icon(Icons.image),
+                                    errorWidget: (_, __, ___) => const Icon(Icons.error),
+                                  ),
+                                  Positioned(
+                                    left: 12,
+                                    bottom: 12,
+                                    right: 12,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const CircleAvatar(
-                                          radius: 10,
-                                          backgroundImage: NetworkImage(
-                                            "https://via.placeholder.com/100",
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
                                         Text(
-                                          article.sourceName,
+                                          article.title,
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
                                           ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          _formatTimeAgo(article.publishedAt),
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                          ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 10,
+                                              backgroundImage: NetworkImage(
+                                                article.urlToImage,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              article.sourceName,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              _formatTimeAgo(article.publishedAt),
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                            );
+                          },
+                        ),
+                      ),
                 ],
               ),
             ),
