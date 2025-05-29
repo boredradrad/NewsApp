@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:news_app/models/news_article_model.dart';
+import 'package:news_app/features/home/models/news_article_model.dart';
 
 class NewsService {
   static const String apiKey = 'YOUR_NEWSAPI_KEY';

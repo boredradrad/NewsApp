@@ -13,10 +13,10 @@ class NewsArticle {
 
   factory NewsArticle.fromJson(Map<String, dynamic> json) {
     return NewsArticle(
-      title: json['title'] ?? 'No Title',
+      title: json['title'] ?? '',
       urlToImage: json['urlToImage'] ?? 'https://via.placeholder.com/150',
-      sourceName: json['source']['name'] ?? 'Unknown Source',
-      publishedAt: DateTime.parse(json['publishedAt']),
+      sourceName: json['source']['name'] ?? 'Unknown',
+      publishedAt: DateTime.tryParse(json['publishedAt'] ?? '') ?? DateTime.now(),
     );
   }
 }
