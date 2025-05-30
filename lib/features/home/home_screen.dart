@@ -1,10 +1,12 @@
 // home_screen.dart
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:news_app/core/service_locator.dart';
 import 'package:news_app/features/home/models/news_article_model.dart';
 import 'package:news_app/features/home/repositories/base_news_api_repository.dart';
 import 'package:news_app/features/home/widgets/category_list_widget.dart';
+import 'package:news_app/features/home/widgets/news_card.dart';
 import 'package:news_app/features/home/widgets/trending_news_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -124,61 +126,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   childCount: _everythingArticles.length,
                   (context, index) {
                     final article = _everythingArticles[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: CachedNetworkImage(
-                          imageUrl: article.urlToImage,
-                          width: 122,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) => const Icon(Icons.image),
-                          errorWidget: (_, __, ___) => const Icon(Icons.error),
-                        ),
-                        title: Text(
-                          article.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        subtitle: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundImage: NetworkImage(article.urlToImage),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                article.sourceName,
-                                style: Theme.of(context).textTheme.bodySmall,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Text(
-                              _formatTimeAgo(article.publishedAt),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                        trailing: Icon(
-                          Icons.bookmark_border,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                      ),
+                    final box = Hive.box('bookmarks');
+                    final isBookmarked = box.containsKey(article.url);
+
+                    return NewsCard(
+                      article: article,
+                      isBookmarked: isBookmarked,
+                      formatTimeAgo: _formatTimeAgo,
                     );
                   },
                 ),
               ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Bookmark'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
     );

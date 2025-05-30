@@ -1,6 +1,7 @@
 // trending_news_widget.dart
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/core/theme/light.dart';
 import 'package:news_app/features/home/models/news_article_model.dart';
 
 class TrendingNews extends StatelessWidget {
@@ -35,7 +36,10 @@ class TrendingNews extends StatelessWidget {
               padding: const EdgeInsets.only(top: 60, left: 16, right: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.black.withOpacity(0.3), Colors.transparent],
+                  colors: [
+                    AppTheme.darkGradientColor.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -46,9 +50,7 @@ class TrendingNews extends StatelessWidget {
                   Center(
                     child: Text(
                       'NEWST',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -57,14 +59,11 @@ class TrendingNews extends StatelessWidget {
                     children: [
                       Text(
                         'Trending News',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Text(
                         'View all',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -110,7 +109,7 @@ class TrendingNews extends StatelessWidget {
                                             context,
                                           ).textTheme.titleMedium?.copyWith(
                                             color:
-                                                Theme.of(context).colorScheme.secondary,
+                                                Theme.of(context).colorScheme.onPrimary,
                                           ),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
@@ -129,24 +128,18 @@ class TrendingNews extends StatelessWidget {
                                               article.sourceName,
                                               style: Theme.of(
                                                 context,
-                                              ).textTheme.bodySmall?.copyWith(
+                                              ).textTheme.bodyMedium?.copyWith(
                                                 color:
                                                     Theme.of(
                                                       context,
-                                                    ).colorScheme.secondary,
+                                                    ).colorScheme.onPrimary,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
                                             Text(
                                               formatTimeAgo(article.publishedAt),
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall?.copyWith(
-                                                color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).colorScheme.secondary,
-                                              ),
+                                              style:
+                                                  Theme.of(context).textTheme.bodySmall,
                                             ),
                                           ],
                                         ),

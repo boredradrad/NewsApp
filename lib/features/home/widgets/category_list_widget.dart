@@ -30,10 +30,9 @@ class CategoryList extends StatelessWidget {
                 Text(
                   cat[0].toUpperCase() + cat.substring(1),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color:
-                        isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurface,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).textTheme.bodyMedium?.color,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
