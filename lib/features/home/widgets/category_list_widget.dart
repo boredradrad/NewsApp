@@ -29,8 +29,11 @@ class CategoryList extends StatelessWidget {
               children: [
                 Text(
                   cat[0].toUpperCase() + cat.substring(1),
-                  style: TextStyle(
-                    color: isSelected ? Colors.red : Colors.black,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color:
+                        isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -38,7 +41,7 @@ class CategoryList extends StatelessWidget {
                   Container(
                     height: 2,
                     width: 30,
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.primary,
                     margin: const EdgeInsets.only(top: 4),
                   ),
               ],

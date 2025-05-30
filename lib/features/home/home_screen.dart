@@ -1,7 +1,9 @@
+// home_screen.dart
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/core/service_locator.dart';
 import 'package:news_app/features/home/models/news_article_model.dart';
-import 'package:news_app/features/home/services/news_service.dart';
+import 'package:news_app/features/home/repositories/base_news_api_repository.dart';
 import 'package:news_app/features/home/widgets/category_list_widget.dart';
 import 'package:news_app/features/home/widgets/trending_news_widget.dart';
 
@@ -13,14 +15,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _service = NewsService();
+  final BaseNewsApiRepository _repository = locator<BaseNewsApiRepository>();
   List<NewsArticle> _topHeadlines = [];
   List<NewsArticle> _everythingArticles = [];
   bool _isLoadingHeadlines = true;
   bool _isLoadingEverything = true;
-  String selectedCategory = 'general';
+  String selectedCategory = 'Top News';
 
   final List<String> categories = [
+    'Top News',
     'business',
     'entertainment',
     'general',
@@ -43,7 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final headlines = await _service.fetchTopHeadlines(category: selectedCategory);
+      final headlines = await _repository.fetchTopHeadlines(
+        category: selectedCategory == 'Top News' ? 'general' : selectedCategory,
+      );
       setState(() {
         _topHeadlines = headlines;
         _isLoadingHeadlines = false;
@@ -56,7 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
-      final everything = await _service.fetchEverything(query: selectedCategory);
+      final everything = await _repository.fetchEverything(
+        query: selectedCategory == 'Top News' ? 'news' : selectedCategory,
+      );
       setState(() {
         _everythingArticles = everything;
         _isLoadingEverything = false;
@@ -102,10 +109,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           _isLoadingEverything
-              ? const SliverToBoxAdapter(
+              ? SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 32),
-                  child: Center(child: CircularProgressIndicator()),
+                  padding: const EdgeInsets.only(top: 32),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 ),
               )
               : SliverList(
@@ -117,20 +128,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                          color: Colors.red,
-                          child: CachedNetworkImage(
-                            imageUrl: article.urlToImage,
-                            width: 122,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => const Icon(Icons.image),
-                            errorWidget: (_, __, ___) => const Icon(Icons.error),
-                          ),
+                        leading: CachedNetworkImage(
+                          imageUrl: article.urlToImage,
+                          width: 122,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => const Icon(Icons.image),
+                          errorWidget: (_, __, ___) => const Icon(Icons.error),
                         ),
                         title: Text(
                           article.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         subtitle: Row(
                           children: [
@@ -142,13 +151,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             Expanded(
                               child: Text(
                                 article.sourceName,
-                                style: TextStyle(overflow: TextOverflow.ellipsis),
+                                style: Theme.of(context).textTheme.bodySmall,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(_formatTimeAgo(article.publishedAt)),
+                            Text(
+                              _formatTimeAgo(article.publishedAt),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ],
                         ),
-                        trailing: const Icon(Icons.bookmark_border),
+                        trailing: Icon(
+                          Icons.bookmark_border,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                       ),
                     );
                   },
@@ -158,8 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        selectedItemColor: Colors.red,
-        unselectedItemColor: Colors.black,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
