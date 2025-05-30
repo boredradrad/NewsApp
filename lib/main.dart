@@ -15,6 +15,7 @@ void main() async {
   Hive.registerAdapter(NewsArticleAdapter());
 
   await Hive.openBox('bookmarks');
+  await Hive.openBox('settings');
   setupLocator();
   runApp(const NewsApp());
 }
