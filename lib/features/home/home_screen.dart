@@ -1,5 +1,3 @@
-// home_screen.dart
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:news_app/core/service_locator.dart';
@@ -41,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNews();
   }
 
+  /// TODO : Task - Make Provider For This
   Future<void> _loadNews() async {
     setState(() {
       _isLoadingHeadlines = true;
@@ -78,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// TODO : Task - Make this extension
   String _formatTimeAgo(DateTime time) {
     final diff = DateTime.now().difference(time);
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -126,6 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   childCount: _everythingArticles.length,
                   (context, index) {
                     final article = _everythingArticles[index];
+
+                    /// TODO : Task - Don't Add Hard Coded Values
                     final box = Hive.box('bookmarks');
                     final isBookmarked = box.containsKey(article.url);
 

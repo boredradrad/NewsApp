@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/features/main/main_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
+  /// TODO : Task - Create Model For This List
   final List<Map<String, String>> onboardingData = [
     {
       'image': 'assets/images/onboarding1.png',
@@ -45,17 +47,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _finishOnboarding() async {
+    /// TODO : Task - Use Preference Manager And don't use hard coded values like [onboarding_complete]
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/main');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return MainScreen();
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      /// TODO : Task - Use from theme data
       backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
+        /// TODO : Task - Add This values on theme data
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -83,13 +95,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 return Column(
                   children: [
                     const SizedBox(height: 16),
+
+                    /// TODO : Task - Use This From Model
                     Image.asset(data['image']!, height: 320, fit: BoxFit.contain),
                     const SizedBox(height: 32),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
+                        /// TODO : Task - Use This From Model
                         data['title']!,
                         textAlign: TextAlign.center,
+
+                        /// TODO : Task - Add This To Theme Data
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -101,8 +118,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Text(
+                        /// TODO : Task - Use This From Model
                         data['desc']!,
                         textAlign: TextAlign.center,
+
+                        /// TODO : Task - Add This To Theme Data
                         style: const TextStyle(fontSize: 18, color: Color(0xFF8A8CA2)),
                       ),
                     ),
@@ -122,7 +142,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 decoration: BoxDecoration(
                   color:
                       _currentPage == index
-                          ? const Color(0xFFD32F2F)
+                          ? const Color(0xFFC53030)
                           : Colors.grey.shade300,
                   shape: BoxShape.circle,
                 ),
@@ -135,9 +155,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
+                /// TODO : Task - Add This To Theme Data
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD32F2F),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  backgroundColor: const Color(0xFFC53030),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
                 onPressed: _onNext,
                 child: Text(

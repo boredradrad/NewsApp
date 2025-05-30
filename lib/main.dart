@@ -8,6 +8,7 @@ import 'package:news_app/features/home/models/news_article_model.dart';
 import 'package:news_app/features/splash/splash_screen.dart';
 import 'package:news_app/features/main/main_screen.dart';
 import 'package:news_app/features/onboarding/onboarding_screen.dart';
+import 'package:news_app/features/auth/sign_in_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -35,6 +36,7 @@ class NewsApp extends StatelessWidget {
       routes: {
         '/main': (_) => const MainScreen(),
         '/onboarding': (_) => const OnboardingScreen(),
+        '/signin': (_) => const SignInScreen(),
       },
     );
   }
@@ -57,13 +59,15 @@ class _SplashScreenWrapperState extends State<SplashScreenWrapper> {
   Future<void> _navigateAfterSplash() async {
     await Future.delayed(const Duration(seconds: 2));
     final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
     final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+    final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
     if (!mounted) return;
-    if (onboardingComplete) {
-      Navigator.of(context).pushReplacementNamed('/main');
-    } else {
+    if (!onboardingComplete) {
       Navigator.of(context).pushReplacementNamed('/onboarding');
+    } else if (!isLoggedIn) {
+      Navigator.of(context).pushReplacementNamed('/signin');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/main');
     }
   }
 

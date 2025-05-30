@@ -32,6 +32,7 @@ class _MainScreenState extends State<MainScreen> {
         },
         currentIndex: _currentScreenIndex,
         items: const [
+          /// TODO : Task - Add Svg Picture Instead Of Icons
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Bookmark'),

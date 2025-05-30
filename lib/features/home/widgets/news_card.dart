@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:news_app/features/home/models/news_article_model.dart';
 
+/// TODO : Task - Make it Shared Component and use it with search screen
 class NewsCard extends StatelessWidget {
   final NewsArticle article;
   final bool isBookmarked;
@@ -24,11 +25,11 @@ class NewsCard extends StatelessWidget {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: CachedNetworkImage(
-          imageUrl: article.urlToImage,
+          imageUrl: article.urlToImage ?? '',
           width: 122,
           fit: BoxFit.cover,
-          placeholder: (_, __) => const Icon(Icons.image),
-          errorWidget: (_, __, ___) => const Icon(Icons.error),
+          placeholder: (_, __) => Container(width: 122, color: Colors.grey.shade400),
+          errorWidget: (_, __, ___) => Container(width: 122, color: Colors.grey.shade400),
         ),
         title: Text(
           article.title,
@@ -38,7 +39,12 @@ class NewsCard extends StatelessWidget {
         ),
         subtitle: Row(
           children: [
-            CircleAvatar(radius: 10, backgroundImage: NetworkImage(article.urlToImage)),
+            if (article.urlToImage != null)
+              CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.grey,
+                backgroundImage: NetworkImage(article.urlToImage!),
+              ),
             const SizedBox(width: 6),
             Expanded(
               child: Text(

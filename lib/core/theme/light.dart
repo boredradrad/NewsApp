@@ -41,7 +41,7 @@ class AppTheme {
         bodyMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
-          color: Colors.black, // Source names
+          color: Colors.black,
         ),
         bodySmall: TextStyle(
           fontSize: 12,
@@ -70,6 +70,21 @@ class AppTheme {
         elevation: 0,
       ),
       splashFactory: NoSplash.splashFactory,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          backgroundColor: Color(0xFFC53030),
+          foregroundColor: Color(0xFFFFFCFC),
+          textStyle: TextStyle(fontSize: 16),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(color: Color(0xFF363636)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide.none,
+        ),
+      ),
     );
   }
 

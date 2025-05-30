@@ -22,14 +22,11 @@ class TrendingNews extends StatelessWidget {
       height: 330,
       child: Stack(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image(
-              image: const AssetImage('assets/images/background.png'),
-              height: 240,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+          Image(
+            image: const AssetImage('assets/images/background.png'),
+            height: 240,
+            width: double.infinity,
+            fit: BoxFit.cover,
           ),
           Positioned.fill(
             child: Container(
@@ -37,7 +34,7 @@ class TrendingNews extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.darkGradientColor.withOpacity(0.3),
+                    AppTheme.darkGradientColor.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                   begin: Alignment.topCenter,
@@ -49,6 +46,7 @@ class TrendingNews extends StatelessWidget {
                 children: [
                   Center(
                     child: Text(
+                      /// Handle Theme Here
                       'NEWST',
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
@@ -61,10 +59,14 @@ class TrendingNews extends StatelessWidget {
                         'Trending News',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
+
+                      /// TODO : MAKE TRENDING NEWS SCREEN
                       Text(
                         'View all',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                          fontSize: 16,
                         ),
                       ),
                     ],
@@ -89,12 +91,22 @@ class TrendingNews extends StatelessWidget {
                               child: Stack(
                                 children: [
                                   CachedNetworkImage(
-                                    imageUrl: article.urlToImage,
+                                    imageUrl: article.urlToImage ?? '',
                                     height: 180,
                                     width: 280,
                                     fit: BoxFit.cover,
-                                    placeholder: (_, __) => const Icon(Icons.image),
-                                    errorWidget: (_, __, ___) => const Icon(Icons.error),
+                                    placeholder:
+                                        (_, __) => Container(
+                                          height: 180,
+                                          width: 280,
+                                          color: Colors.grey.shade400,
+                                        ),
+                                    errorWidget:
+                                        (_, __, ___) => Container(
+                                          height: 180,
+                                          width: 280,
+                                          color: Colors.grey.shade400,
+                                        ),
                                   ),
                                   Positioned(
                                     left: 12,
@@ -117,12 +129,13 @@ class TrendingNews extends StatelessWidget {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            CircleAvatar(
-                                              radius: 10,
-                                              backgroundImage: NetworkImage(
-                                                article.urlToImage,
+                                            if (article.urlToImage != null)
+                                              CircleAvatar(
+                                                radius: 10,
+                                                backgroundImage: NetworkImage(
+                                                  article.urlToImage!,
+                                                ),
                                               ),
-                                            ),
                                             const SizedBox(width: 6),
                                             Text(
                                               article.sourceName,

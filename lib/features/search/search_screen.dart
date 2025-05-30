@@ -7,7 +7,7 @@ class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -76,15 +76,22 @@ class _SearchScreenState extends State<SearchScreen> {
                         itemBuilder: (context, index) {
                           final article = _articles[index];
                           return ListTile(
-                            leading: Image.network(
-                              article.urlToImage,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (context, error, stackTrace) =>
-                                      const Icon(Icons.image_not_supported),
-                            ),
+                            leading:
+                                article.urlToImage != null
+                                    ? Image.network(
+                                      article.urlToImage!,
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.image_not_supported),
+                                    )
+                                    : Container(
+                                      width: 50,
+                                      height: 50,
+                                      color: Colors.grey.shade400,
+                                    ),
                             title: Text(article.title),
                             subtitle: Text(
                               '${article.sourceName} • ${article.publishedAt.toString()}',

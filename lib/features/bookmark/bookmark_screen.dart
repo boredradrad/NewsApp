@@ -5,6 +5,7 @@ import 'package:news_app/features/home/widgets/news_card.dart';
 class BookmarkScreen extends StatelessWidget {
   const BookmarkScreen({super.key});
 
+  /// TODO : Task - Make it shared and make it extension
   String _formatTimeAgo(DateTime time) {
     final diff = DateTime.now().difference(time);
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -17,6 +18,7 @@ class BookmarkScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Bookmarks')),
       body: ValueListenableBuilder(
+        /// TODO : Task - Don't Add Hard Coded Values
         valueListenable: Hive.box('bookmarks').listenable(),
         builder: (context, Box box, _) {
           if (box.isEmpty) {
