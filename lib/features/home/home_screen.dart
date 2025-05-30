@@ -121,20 +121,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               )
-              : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: _everythingArticles.length,
-                  (context, index) {
-                    final article = _everythingArticles[index];
-
-                    /// TODO : Task - Don't Add Hard Coded Values
-                    final box = Hive.box('bookmarks');
-                    final isBookmarked = box.containsKey(article.url);
-
-                    return NewsCard(
-                      article: article,
-                      isBookmarked: isBookmarked,
-                      formatTimeAgo: _formatTimeAgo,
+              : SliverToBoxAdapter(
+                child: ValueListenableBuilder(
+                  valueListenable: Hive.box('bookmarks').listenable(),
+                  builder: (context, Box box, _) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _everythingArticles.length,
+                      itemBuilder: (context, index) {
+                        final article = _everythingArticles[index];
+                        final isBookmarked = box.containsKey(article.url);
+                        return NewsCard(
+                          article: article,
+                          isBookmarked: isBookmarked,
+                          formatTimeAgo: _formatTimeAgo,
+                        );
+                      },
                     );
                   },
                 ),
