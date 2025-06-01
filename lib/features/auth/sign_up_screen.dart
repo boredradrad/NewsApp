@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/core/constants/storage_key.dart';
+import 'package:news_app/core/extentions/extensions.dart';
 import 'package:news_app/core/widgets/custom_text_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../core/services/preferences_manager.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,7 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _errorMessage = null;
       _loading = true;
     });
-    final prefs = await SharedPreferences.getInstance();
+
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
@@ -38,7 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       return;
     }
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+    if (!email.isValidEmail) {
       setState(() {
         _errorMessage = 'Please enter a valid email address.';
         _loading = false;
@@ -60,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
     // Check if user already exists
-    final savedEmail = prefs.getString('user_email');
+    final savedEmail = PreferencesManager().getString(StorageKey.userEmail);
     if (savedEmail != null && savedEmail == email) {
       setState(() {
         _errorMessage = 'An account with this email already exists.';
@@ -68,9 +72,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       return;
     }
-    await prefs.setString('user_email', email);
-    await prefs.setString('user_password', password);
-    await prefs.setBool('is_logged_in', true);
+    await PreferencesManager().setString(StorageKey.userEmail, email);
+    await PreferencesManager().setString(StorageKey.userPassword, password);
+    await PreferencesManager().setBool(StorageKey.isLoggedIn, true);
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/main');
   }

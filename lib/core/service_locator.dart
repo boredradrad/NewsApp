@@ -9,6 +9,8 @@ final GetIt locator = GetIt.instance;
 
 void setupLocator() {
   locator.registerSingleton<BaseApiService>(ApiService());
+
+
   locator.registerSingleton<BaseNewsApiRepository>(
     NewsApiRepositoryImpl(locator<BaseApiService>()),
   );

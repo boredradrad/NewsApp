@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:news_app/core/theme/light_colors.dart';
 import 'package:news_app/features/bookmark/bookmark_screen.dart';
 import 'package:news_app/features/home/home_screen.dart';
 import 'package:news_app/features/profile/profile_screen.dart';
@@ -13,6 +15,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentScreenIndex = 0;
+
+  SvgPicture _buildSvgPicture(String path, int index) => SvgPicture.asset(
+    path,
+    colorFilter: ColorFilter.mode(
+      _currentScreenIndex == index ? Theme.of(context).colorScheme.primary: Theme.of(context).colorScheme.tertiary,
+      BlendMode.srcIn,
+    ),
+  );
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -31,15 +41,29 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         currentIndex: _currentScreenIndex,
-        items: const [
-          /// TODO : Task - Add Svg Picture Instead Of Icons
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Bookmark'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+        items: [
+          BottomNavigationBarItem(
+            icon: _buildSvgPicture('assets/images/Home.svg', 0),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildSvgPicture('assets/images/Search.svg', 1),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildSvgPicture('assets/images/bookmark.svg', 2),
+            label: 'Bookmark',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildSvgPicture('assets/images/profile.svg', 3),
+            label: 'Profile',
+          ),
         ],
       ),
       body: _screens[_currentScreenIndex],
     );
   }
+
 }
+
+

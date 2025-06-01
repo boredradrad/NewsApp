@@ -1,21 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:news_app/core/extentions/extensions.dart';
 import 'package:news_app/features/home/models/news_article_model.dart';
 
-/// TODO : Task - Make it Shared Component and use it with search screen
+/// TODO-Done : Task - Make it Shared Component and use it with search screen
 class NewsCard extends StatelessWidget {
   final NewsArticle article;
   final bool isBookmarked;
   final Function()? onBookmarkPressed;
-  final String Function(DateTime) formatTimeAgo;
+  final bool withBookmark;
 
   const NewsCard({
     super.key,
     required this.article,
     this.isBookmarked = false,
     this.onBookmarkPressed,
-    required this.formatTimeAgo,
+    this.withBookmark = true
   });
 
   @override
@@ -64,9 +65,10 @@ class NewsCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          formatTimeAgo(article.publishedAt),
+                          article.publishedAt.formatTimeAgo,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
+                        if(withBookmark)
                         IconButton(
                           icon: Icon(
                             isBookmarked ? Icons.bookmark : Icons.bookmark_border,

@@ -22,6 +22,7 @@ class NewsArticleAdapter extends TypeAdapter<NewsArticle> {
       sourceName: fields[2] as String,
       publishedAt: fields[3] as DateTime,
       url: fields[4] as String,
+      content: fields[5] as String
     );
   }
 
